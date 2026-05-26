@@ -1,6 +1,6 @@
 {
   "name": "create-love-steam-game",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Scaffold a Love2D + Steam multiplayer game — lobby, networking, build pipeline, all wired up.",
   "keywords": [
     "love2d",
@@ -20,7 +20,8 @@
   },
   "files": [
     "cli.js",
-    "templates/**"
+    "templates/**",
+    "templates/steam_appid.txt"
   ],
   "dependencies": {
     "chalk": "^5.6.2",
