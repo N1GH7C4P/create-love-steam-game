@@ -36,7 +36,6 @@ my-game/
 
 - [Love2D](https://love2d.org/) (≥ 11.5)
 - Node.js ≥ 18 (for the CLI only)
-- [luasteam](https://github.com/uspgamedev/luasteam/releases) native libraries (for Steam features)
 - [steamcmd](https://developer.valvesoftware.com/wiki/SteamCMD) (for deploying to Steam)
 
 ## Quick start
