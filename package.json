@@ -1,6 +1,6 @@
 {
   "name": "create-love-steam-game",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Scaffold a Love2D + Steam multiplayer game — lobby, networking, build pipeline, all wired up.",
   "keywords": [
     "love2d",
@@ -13,7 +13,7 @@
   "license": "MIT",
   "type": "module",
   "bin": {
-    "create-love-steam-game": "./cli.js"
+    "create-love-steam-game": "cli.js"
   },
   "engines": {
     "node": ">=18"
