@@ -1,0 +1,15 @@
+# Build output
+dist/
+.love-build/
+.build-staging/
+src/version.lua
+
+# Local secrets — never commit
+.env
+
+# OS clutter
+.DS_Store
+Thumbs.db
+
+# Log output
+logs/

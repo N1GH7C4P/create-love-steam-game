@@ -1,0 +1,30 @@
+{
+  "name": "create-love-steam-game",
+  "version": "0.1.0",
+  "description": "Scaffold a Love2D + Steam multiplayer game — lobby, networking, build pipeline, all wired up.",
+  "keywords": [
+    "love2d",
+    "steam",
+    "multiplayer",
+    "game",
+    "scaffolding",
+    "lua"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "create-love-steam-game": "./index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "index.js",
+    "templates/**"
+  ],
+  "dependencies": {
+    "chalk": "^5.6.2",
+    "fs-extra": "^11.3.5",
+    "inquirer": "^9.3.8"
+  }
+}
