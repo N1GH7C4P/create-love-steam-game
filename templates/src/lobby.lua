@@ -46,7 +46,7 @@ local _join_focused = "ip"
 local _discovered   = {}
 local _connect_error = nil
 local _connect_timer = 0
-local _local_player_name  = "Player"
+local _local_player_name  = nil   -- set to Steam.my_name() on init
 local _local_is_ready     = false
 
 local _chat_messages = {}
@@ -121,9 +121,10 @@ end
 -- ── Host init ─────────────────────────────────────────────────────────────────
 
 local function init_host_lan()
+	_local_player_name = Steam.my_name()
 	_slots = make_default_slots(_slot_count)
 	_slots[1].kind        = "human"
-	_slots[1].player_name = Steam.my_name()
+	_slots[1].player_name = _local_player_name
 	_slots[1].is_host     = true
 	_slots[1].is_ready    = true
 
@@ -158,6 +159,7 @@ end
 -- ── Client join ───────────────────────────────────────────────────────────────
 
 local function do_connect_lan(ip, port)
+	_local_player_name = Steam.my_name()
 	_mode = "join_connecting"
 	_connect_error = nil
 	_connect_timer = 0
@@ -174,6 +176,7 @@ local function do_connect_lan(ip, port)
 end
 
 local function do_connect_steam(host_steam_id)
+	_local_player_name = Steam.my_name()
 	_mode = "join_connecting"
 	_connect_error = nil
 	Net.init_client(host_steam_id, DEFAULT_PORT, "client")

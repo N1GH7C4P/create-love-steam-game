@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-import { createRequire } from "module";
 import { fileURLToPath } from "url";
 import path from "path";
 import fs from "fs";
+import { execSync } from "child_process";
 import fse from "fs-extra";
 import chalk from "chalk";
 import inquirer from "inquirer";
@@ -141,18 +141,22 @@ async function main() {
   const destDir  = path.resolve(answers.destDir.trim());
   const [windowWidth, windowHeight] = answers.windowSize.split("x");
 
+  const appId = answers.steamAppId.trim();
+
   const vars = {
     GAME_NAME:           gameName,
     GAME_SLUG:           toSlug(gameName),
     GAME_TAG:            toTag(gameName),
     GAME_IDENTITY:       toPascal(gameName),
-    STEAM_APP_ID:        answers.steamAppId.trim(),
+    STEAM_APP_ID:        appId,
     STEAM_DEPOT_MACOS:   answers.depotMacos.trim(),
     STEAM_DEPOT_WINDOWS: answers.depotWindows.trim(),
     STEAM_DEPOT_LINUX:   answers.depotLinux.trim(),
     DEFAULT_PORT:        answers.port.trim(),
     WINDOW_WIDTH:        windowWidth,
     WINDOW_HEIGHT:       windowHeight,
+    // 480 = Spacewar (Valve's dev test app). Used locally when no real App ID is set yet.
+    STEAM_APPID_LOCAL:   appId === "0" ? "480" : appId,
   };
 
   if (fs.existsSync(destDir)) {
@@ -173,10 +177,19 @@ async function main() {
   await copyAndSubstitute(TEMPLATES_DIR, destDir, vars);
 
   // chmod +x on shell scripts
-  const scripts = ["scripts/build-native.sh", "scripts/deploy-steam.sh"];
+  const scripts = ["scripts/build-native.sh", "scripts/deploy-steam.sh", "scripts/download-libs.sh"];
   for (const s of scripts) {
     const p = path.join(destDir, s);
     if (fs.existsSync(p)) fs.chmodSync(p, 0o755);
+  }
+
+  // Download luasteam native libraries automatically
+  console.log();
+  console.log(chalk.bold("  Downloading luasteam…"));
+  try {
+    execSync(`bash "${path.join(destDir, "scripts/download-libs.sh")}"`, { stdio: "inherit" });
+  } catch {
+    console.log(chalk.yellow("  ⚠ luasteam download failed — run scripts/download-libs.sh manually."));
   }
 
   // Check for unreplaced tokens (development guard)
@@ -206,8 +219,7 @@ async function main() {
   console.log(chalk.bold("  Next steps:"));
   console.log();
   console.log(`    cd ${answers.destDir.trim()}`);
-  console.log(`    # Drop luasteam native libraries into lib/`);
-  console.log(`    # (see lib/README.md for download links)`);
+  console.log(`    # Add steam_api to lib/ (see lib/README.md — requires Steamworks SDK)`);
   console.log(`    love .`);
   console.log();
   console.log(chalk.dim("  To build and deploy to Steam:"));

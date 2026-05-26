@@ -9,12 +9,13 @@ function love.conf(t)
 
 	-- Extend cpath so require("luasteam") finds the native library.
 	-- love.filesystem is available here; love.system is NOT.
-	-- getSourceBaseDirectory() returns Contents/Resources/ for a love-build macOS bundle.
+	-- getSourceBaseDirectory() returns Contents/Resources/ for a love-build macOS bundle,
+	-- which is where the build script places luasteam.so/.dll.
+	-- The lib/<platform> entries cover local dev runs via `love .` (cwd = project root).
 	local src = love.filesystem.getSourceBaseDirectory() or ""
 	if src ~= "" then
 		if not src:match("[/\\]$") then src = src .. "/" end
 		package.cpath = src .. "?.so;" .. src .. "?.dll;" .. package.cpath
 	end
-	-- local dev fallback (relative paths only work when running from project root)
 	package.cpath = "lib/macos/?.so;lib/windows/?.dll;lib/linux/?.so;" .. package.cpath
 end

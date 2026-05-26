@@ -13,3 +13,7 @@ Thumbs.db
 
 # Log output
 logs/
+
+# Steam local dev override — use 480 (Spacewar) during development
+# Your real App ID lives in scripts/deploy-steam.sh, not here
+steam_appid.txt

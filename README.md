@@ -49,6 +49,43 @@ love .
 
 Two terminals → two instances → click "Host" in one, "Join" in the other via LAN. No Steam libraries needed for local testing.
 
+## Steam setup (required for Steam features)
+
+Steam P2P networking and lobby discovery require two native libraries in your `lib/` folder: **luasteam** (downloaded automatically by the scaffolder) and **steam_api** (must be obtained manually from Valve).
+
+### 1. Download the Steamworks SDK
+
+1. Go to [partner.steamgames.com/downloads/list](https://partner.steamgames.com/downloads/list) and sign in with your Steam account
+2. Download the latest **Steamworks SDK** zip
+3. Extract it anywhere on your machine
+
+### 2. Copy steam_api into your project
+
+From the extracted SDK, copy the platform-specific file into your project's `lib/` folder:
+
+| Platform | SDK path | Destination |
+|---|---|---|
+| macOS | `redistributable_bin/osx/libsteam_api.dylib` | `lib/macos/libsteam_api.dylib` |
+| Windows 64-bit | `redistributable_bin/win64/steam_api64.dll` | `lib/windows/steam_api64.dll` |
+| Linux 64-bit | `redistributable_bin/linux64/libsteam_api.so` | `lib/linux/libsteam_api.so` |
+
+```bash
+# macOS example
+cp ~/steamworks_sdk/redistributable_bin/osx/libsteam_api.dylib lib/macos/
+
+# Windows example
+cp ~/steamworks_sdk/redistributable_bin/win64/steam_api64.dll lib/windows/
+
+# Linux example
+cp ~/steamworks_sdk/redistributable_bin/linux64/libsteam_api.so lib/linux/
+```
+
+### 3. Set your App ID
+
+If you used App ID `0` during scaffolding, your project defaults to **480 (Spacewar)** — Valve's public test app that any Steam account can use for development. This is fine for local testing.
+
+When you have a real App ID, update `steam_appid.txt` in the project root with your ID.
+
 ## Building for Steam
 
 ```bash
