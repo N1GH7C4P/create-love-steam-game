@@ -121,7 +121,7 @@ Client                         Host
   ├─ SCORE_UPDATE ─────────────► │  (your game action)
   │ ◄──────────── FULL_STATE ────┤  (immediate response)
   │                              │
-  │ ◄──────────── SYNC_CHECK ────┤  (every 3 sim-ticks)
+  │ ◄──────────── SYNC_CHECK ────┤  (every SYNC_CHECK_EVERY ticks)
   │ ◄──────────── GAME_TICK ─────┤  (every real second)
 ```
 

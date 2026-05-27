@@ -9,8 +9,8 @@
 --   client → host   GAME_READY     "I'm in the game loop, send me the full state"
 --   host   → client FULL_STATE     full authoritative state (on GAME_READY + every 5s)
 --   client → host   SCORE_UPDATE   player clicked the button
---   host   → all    SYNC_CHECK     compact snapshot every 3 sim-ticks
---   host   → all    GAME_TICK      sim tick (every real second)
+--   host   → all    SYNC_CHECK     compact snapshot every SYNC_CHECK_EVERY ticks
+--   host   → all    GAME_TICK      game tick (every TICK_INTERVAL seconds)
 
 local GameManager = {}
 
@@ -21,16 +21,16 @@ local Net = require("src.net")
 local _config        = nil    -- config table passed in from Lobby (is_host, slots, …)
 local _local_id      = nil    -- company/player ID for this instance
 local _players       = {}     -- {player_id → {id, name, score}}
-local _sim_day       = 0
+local _tick_count       = 0
 local _game_over     = false
 local _winner_id     = nil
 local WIN_TARGET     = 10     -- first to 10 clicks wins
 
 -- Timers
 local _tick_timer        = 0
-local TICK_INTERVAL      = 1.0   -- one sim-day per real second
+local TICK_INTERVAL      = 1.0   -- seconds per game tick (lower = faster simulation)
 local _sync_check_timer  = 0
-local SYNC_CHECK_EVERY   = 3     -- days between SYNC_CHECK broadcasts
+local SYNC_CHECK_EVERY   = 3     -- ticks between SYNC_CHECK broadcasts (lower = more consistent, more bandwidth)
 local _push_timer        = nil   -- host proactive FULL_STATE push after game start
 
 -- UI
@@ -53,7 +53,7 @@ end
 
 local function get_full_state()
 	return {
-		sim_day    = _sim_day,
+		tick_count    = _tick_count,
 		game_over  = _game_over,
 		winner_id  = _winner_id,
 		win_target = WIN_TARGET,
@@ -63,7 +63,7 @@ local function get_full_state()
 end
 
 local function apply_full_state(state, as_local_id)
-	_sim_day   = state.sim_day   or _sim_day
+	_tick_count   = state.tick_count   or _tick_count
 	_game_over = state.game_over or false
 	_winner_id = state.winner_id
 	WIN_TARGET = state.win_target or WIN_TARGET
@@ -88,7 +88,7 @@ local function broadcast_sync_check()
 	for id, p in pairs(_players) do
 		snap.players[id] = {name = p.name, score = p.score}
 	end
-	snap.day = _sim_day
+	snap.day = _tick_count
 	Net.broadcast({t = Net.MSG.SYNC_CHECK, snap = snap})
 end
 
@@ -110,7 +110,7 @@ function GameManager.init(config, opts)
 	_on_quit = opts.on_quit
 	_config  = config
 
-	_sim_day    = 0
+	_tick_count    = 0
 	_game_over  = false
 	_winner_id  = nil
 	_players    = {}
@@ -197,7 +197,7 @@ local function handle_event(ev)
 			if desync then
 				Net.send_to_server({t = Net.MSG.SYNC_REQUEST})
 			end
-			_sim_day = ev.data.day or _sim_day
+			_tick_count = ev.data.day or _tick_count
 		end
 
 	elseif t == Net.MSG.SYNC_REQUEST then
@@ -222,7 +222,7 @@ local function handle_event(ev)
 		end
 
 	elseif t == Net.MSG.GAME_TICK then
-		_sim_day = ev.data and ev.data.day or _sim_day
+		_tick_count = ev.data and ev.data.day or _tick_count
 
 	elseif t == "disconnect" then
 		local cid = Net.get_company_for_peer(ev.peer)
@@ -247,13 +247,13 @@ function GameManager.update(dt)
 		end
 	end
 
-	-- Host: sim tick + periodic sync check
+	-- Host: game tick + periodic sync check
 	if Net.is_host() and not _game_over then
 		_tick_timer = _tick_timer + dt
 		if _tick_timer >= TICK_INTERVAL then
 			_tick_timer = _tick_timer - TICK_INTERVAL
-			_sim_day = _sim_day + 1
-			Net.broadcast({t = Net.MSG.GAME_TICK, day = _sim_day})
+			_tick_count = _tick_count + 1
+			Net.broadcast({t = Net.MSG.GAME_TICK, day = _tick_count})
 			_sync_check_timer = _sync_check_timer + 1
 			if _sync_check_timer >= SYNC_CHECK_EVERY then
 				_sync_check_timer = 0
@@ -308,7 +308,7 @@ function GameManager.draw()
 	-- Scoreboard
 	love.graphics.setFont(_font_body)
 	love.graphics.setColor(0.6, 0.75, 1.0, 0.8)
-	love.graphics.print("Day " .. _sim_day .. "   First to " .. WIN_TARGET .. " wins", 20, 16)
+	love.graphics.print("Tick " .. _tick_count .. "   First to " .. WIN_TARGET .. " wins", 20, 16)
 
 	local py = 60
 	local sorted = {}
