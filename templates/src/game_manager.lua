@@ -10,7 +10,7 @@
 --   host   → client FULL_STATE     full authoritative state (on GAME_READY + every 5s)
 --   client → host   SCORE_UPDATE   player clicked the button
 --   host   → all    SYNC_CHECK     compact snapshot every 3 sim-ticks
---   host   → all    DAY_TICK       sim tick (every real second)
+--   host   → all    GAME_TICK      sim tick (every real second)
 
 local GameManager = {}
 
@@ -221,7 +221,7 @@ local function handle_event(ev)
 			end
 		end
 
-	elseif t == Net.MSG.DAY_TICK then
+	elseif t == Net.MSG.GAME_TICK then
 		_sim_day = ev.data and ev.data.day or _sim_day
 
 	elseif t == "disconnect" then
@@ -253,7 +253,7 @@ function GameManager.update(dt)
 		if _tick_timer >= TICK_INTERVAL then
 			_tick_timer = _tick_timer - TICK_INTERVAL
 			_sim_day = _sim_day + 1
-			Net.broadcast({t = Net.MSG.DAY_TICK, day = _sim_day})
+			Net.broadcast({t = Net.MSG.GAME_TICK, day = _sim_day})
 			_sync_check_timer = _sync_check_timer + 1
 			if _sync_check_timer >= SYNC_CHECK_EVERY then
 				_sync_check_timer = 0

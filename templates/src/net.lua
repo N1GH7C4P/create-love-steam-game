@@ -24,7 +24,7 @@ Net.MSG = {
 	FULL_STATE    = "fs",    -- host→client: authoritative full game state
 	SYNC_CHECK    = "syn",   -- host→clients: compact periodic snapshot
 	SYNC_REQUEST  = "syr",   -- client→host: requesting full resync
-	DAY_TICK      = "dt",    -- host→all: simulation tick
+	GAME_TICK     = "dt",    -- host→all: simulation tick
 	PLAYER_JOIN   = "pj",
 	PLAYER_LEAVE  = "pl",
 	-- Placeholder game message — replace with your own

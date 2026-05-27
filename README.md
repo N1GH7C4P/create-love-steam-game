@@ -1,10 +1,14 @@
 # create-love-steam-game
 
+[![npm version](https://img.shields.io/npm/v/create-love-steam-game)](https://www.npmjs.com/package/create-love-steam-game)
+
 Scaffold a complete Love2D + Steam multiplayer game in seconds.
 
 ```bash
 npx create-love-steam-game my-game
 ```
+
+No installation needed — just run the command above. Node.js ≥ 18 required.
 
 You get a fully wired project: Steam P2P networking, a working lobby (host/join/LAN/Steam), synchronized game state, a cross-platform build pipeline (love-build), and a Steam deploy script — all battle-tested and ready to run.
 
@@ -118,7 +122,7 @@ Client                         Host
   │ ◄──────────── FULL_STATE ────┤  (immediate response)
   │                              │
   │ ◄──────────── SYNC_CHECK ────┤  (every 3 sim-ticks)
-  │ ◄──────────── DAY_TICK ──────┤  (every real second)
+  │ ◄──────────── GAME_TICK ─────┤  (every real second)
 ```
 
 Transport is Steam P2P relay (ISteamNetworkingSockets) when available, enet UDP otherwise. The `src/net.lua` API is identical for both.
